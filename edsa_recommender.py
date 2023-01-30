@@ -171,8 +171,8 @@ def main():
 
         with tab1:
             st.subheader("Chima Enyeribe")
-            st.markdown("Chief Executive Officer")
-            st.image("resources/imgs/chima.webp", width=200)
+            st.markdown("Data Scientist")
+            st.image("resources/imgs/Jasper.jpg", width=200)
             st.markdown("jasperobed@gmail.com")
         with tab2:
             st.subheader("Kazeem Okunola")
