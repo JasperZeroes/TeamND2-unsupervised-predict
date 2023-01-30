@@ -138,9 +138,9 @@ def collab_model(movie_list, top_n=10):
     idx_3 = indices[indices == movie_list[2]].index[0]
 
     # Creating a Series with the similarity scores in descending order
-    rank_1 = cosine_sim[6]
-    rank_2 = cosine_sim[24]
-    rank_3 = cosine_sim[89]
+    rank_1 = cosine_sim[idx_1]
+    rank_2 = cosine_sim[idx_2]
+    rank_3 = cosine_sim[idx_3]
 
     # Calculating the scores
     score_series_1 = pd.Series(rank_1).sort_values(ascending=False)
