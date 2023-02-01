@@ -116,10 +116,10 @@ def main():
     # ------------- SAFE FOR ALTERING/EXTENSION -------------------
 
     if page_selection == "Company Profile":
-        st.title("Company Profile")
-        st.image("resources/imgs/tritech.jpeg", width=200)
+        #st.title("TriTech Inc. Company Profile")
+        st.image("resources/imgs/tritech.jpeg", width=400)
         st.write("""
-        TriTech Inc. was established in April 2015 to provide digital technology solutions for a wide range of domain businesses. Our founding mission was to cultivate professional relationships with our customers to provide reliable digital technology solutions for their requirements. """)
+        TriTech Inc. was established in April 2015 to provide digital technology solutions for a wide range of domain businesses. Our founding mission was to cultivate professional relationships with our customers to provide reliable cutting edge technological solutions for their requirements. """)
         st.write("\n")
         st.write("""The team at TriTech Inc. is equipped with a wide range of cross-domain skillset developed over years of experience not only in information technology but also in business processes, financial services, construction and telecommunications across a range of various subdomains.
         This business experience makes service offerings uniquely positioned to provide solutions promising better cost savings, operational efficiency and productivity gains for each of our customers, regardless of their industry.
@@ -132,11 +132,11 @@ def main():
         st.write("""At TriTech Inc., we guarantee rapid, reliable and robust turn-key digital solutions that will transform your business.""")
     if page_selection == "Solution Overview":
         st.title("Solution Overview")
-        st.write("This page details our solution comprehensively")
-        st.markdown("#### Collaborative vs Content-based filtering")
+        st.markdown("#### This page details our solution comprehensively")
+        st.markdown("#### Collaborative-based vs Content-based filtering")
         st.write(
             "We used 2 different approaches to do our movie recommendation solution:")
-        st.write("+ Collaborative filtering")
+        st.write("+ Collaborative-based filtering")
         st.write("""With this approach, the application will recommend movies to a specific user based on how they rated movies compared to other users. \n If for example a user gave a 5 star rating Toy Story 1 then the application will recommend movies based on what other users watched who rated Toy Story 1 at 5 star.
         """)
         st.write("+ Content-based filtering")
@@ -156,6 +156,7 @@ def main():
             """)
         st.image("resources/imgs/model_comparison.png")
         st.write("""
+        The SVD model gave an RMSE score of 0.813.
         A low RMSE score means the model performs well because it means the difference between what our movie application recommended 
         and what the user actually liked is low. \n
             """)
@@ -168,8 +169,9 @@ def main():
         SVD is also used to reduce the dimensionality of the data which can help to improve the efficiency of the algorithm and also help to improve the model's generalization capabilities. \n
         """)
     if page_selection == "Movies Heatmap":
+        st.title("Movie Heatmap")
         st.info(
-            "This page shows a comparison of the model performance")
+            "This page shows a heatmap of the movie ratings for a few titles in the dataset")
         df_out = ratings_df.join(movie_df.set_index('movieId'), on='movieId')
 
         # Create a neat version of the utility matrix to assist with plotting book titles
@@ -210,29 +212,36 @@ def main():
         st.info(
             "Below is detailed information about the our business and the team")
     if page_selection == "Team":
+        st.title(
+            "About the team")
         st.info(
-            "Below is information about the team")
+            "Read the profile of TriTech Inc. leadership team below")
         tab1, tab2, tab3, tab4 = st.tabs(
             ["Chima", "Kazeem", "Thepe", "Dotun"])
 
         with tab1:
             st.subheader("Chima Enyeribe")
-            st.markdown("Data Scientist")
-            st.image("resources/imgs/Jasper.jpg", width=200)
+            st.markdown("#### Chief Data Scientist")
+            st.image("resources/imgs/chima.webp", width=200)
+            st.write("""
+            Chima Enyeribe is the founder and CEO of TriTech Inc., a position he has held since the company's inception in April 2015. Prior to founding TriTech, Chima worked for Zen Bank in Nigeria, providing financial service solutions to individuals and corporates across 19 countries in Africa, Latin America and Asia.
+            Under his leadership, the Bank serviced over 5 million customers and had $3 million of assets under management.
+            Chima is a seasoned business leader with experience in engineering, financial services and construction. Since founding TriTech, Chima has played a pivotal role in the strengthening the company's financial position, strategy formulation and successful listing on the Nigerian and Ghanaian Stock Exchanges.
+            """)
             st.markdown("jasperobed@gmail.com")
         with tab2:
             st.subheader("Kazeem Okunola")
-            st.markdown("Chief Financial Officer")
+            st.markdown("#### Data Engineer")
             st.image("resources/imgs/kazeem.webp", width=200)
             st.markdown("achieverk2@gmail.com")
         with tab3:
             st.subheader("Thepe Mashala")
-            st.markdown("Chief Operations Officer")
+            st.markdown("#### Software Engineer")
             st.image("resources/imgs/8324.jpg", width=200)
             st.markdown("tpmashala@gmail.com")
         with tab4:
             st.subheader("Dotun Olasogba")
-            st.markdown("Chief Digital Officer")
+            st.markdown("#### Product Manager")
             st.image("resources/imgs/dotun.jpeg", width=200)
             st.markdown("dotunolasogba@yahoo.com")
         # You may want to add more sections here for aspects such as an EDA,
