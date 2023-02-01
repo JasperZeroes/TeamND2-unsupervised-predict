@@ -31,6 +31,10 @@ import streamlit as st
 # Data handling dependencies
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import scipy as sp
+from sklearn.metrics.pairwise import cosine_similarity
 
 # Custom Libraries
 from utils.data_loader import load_movie_titles
@@ -41,6 +45,8 @@ from recommenders.content_based import content_model
 title_list = load_movie_titles('resources/data/movies.csv')
 # load additional files
 # imdb_df = pd.read_csv('resources/data/imdb_data.csv')
+ratings_df = pd.read_csv('resources/data/ratings.csv')
+movie_df = pd.read_csv('resources/data/movies.csv')
 # App declaration
 
 
@@ -49,7 +55,7 @@ def main():
     # DO NOT REMOVE the 'Recommender System' option below, however,
     # you are welcome to add more options to enrich your app.
     page_options = ["Company Profile", "About the Project", "Solution Overview", "Recommender System",
-                    "Model Comparison", "Team"]
+                    "Movies Heatmap", "Team"]
 
     # -------------------------------------------------------------------
     # ----------- !! THIS CODE MUST NOT BE ALTERED !! -------------------
@@ -90,8 +96,8 @@ def main():
             if st.button("Recommend"):
                 try:
                     with st.spinner('Crunching the numbers...'):
-                        top_recommendations = collab_model(movie_list=fav_movies,
-                                                           top_n=10)
+                        top_recommendations = content_model(movie_list=fav_movies,
+                                                            top_n=10)
                     st.title("We think you'll like:")
                     for i, j in enumerate(top_recommendations):
                         st.subheader(str(i+1)+'. '+j)
@@ -105,7 +111,7 @@ def main():
 
     if page_selection == "Company Profile":
         st.title("Company Profile")
-        st.image("resources/imgs/dc_marvel.webp")
+        st.image("resources/imgs/tritech.jpeg", width=200)
         st.write("""
         TriTech Inc. was established in April 2015 to provide digital technology solutions for a wide range of domain businesses. Our founding mission was to cultivate professional relationships with our customers to provide reliable digital technology solutions for their requirements. """)
         st.write("\n")
@@ -120,34 +126,58 @@ def main():
         st.write("""At TriTech Inc., we guarantee rapid, reliable and robust turn-key digital solutions that will transform your business.""")
     if page_selection == "Solution Overview":
         st.title("Solution Overview")
-        st.write("Describe your winning approach on this page")
-    # if page_selection == "Model Predictions":
-    #     st.info("Prediction with ML Models")
-    #     st.write("The movies below are recommended based on the collaborative model which for this exercise we chose the SVD model")
-    #     st.image("resources/imgs/model_image.jpeg")
-    #     st.write("Please choose your 3 favourite movies from the table below...")
-
-    #     fav_movies = st.multiselect(
-    #         'Select favourite movies:', title_list[14930:15200], max_selections=3)
-    #     st.write('### Selected Movies')
-    #     st.table(pd.DataFrame(
-    #         fav_movies, columns=["Title"]))
-
-    #     st.write("Please click the button below to see the recommended movies")
-    #     if st.button("Recommend"):
-    #         try:
-    #             with st.spinner('Crunching the numbers...'):
-    #                 top_recommendations = collab_model(movie_list=fav_movies,
-    #                                                    top_n=10)
-    #             st.title("We think you'll like:")
-    #             for i, j in enumerate(top_recommendations):
-    #                 st.subheader(str(i+1)+'. '+j)
-    #         except:
-    #             st.error("Oops! Looks like this algorithm does't work.\
-    #                         We'll need to fix it!")
-    if page_selection == "Model Comparison":
+        st.write("This page details our solution comprehensively")
+        st.markdown("#### Collaborative vs Content-based filtering")
+        st.write(
+            "We used 2 different approaches to do our movie recommendation solution:")
+        st.write("+ Collaborative filtering")
+        st.write("""With this approach, the application will recommend movies to a specific user based on how they rated movies compared to other users. \n If for example a user gave a 5 star rating Toy Story 1 then the application will recommend movies based on what other users watched who rated Toy Story 1 at 5 star.
+        """)
+        st.write("+ Content-based filtering")
+        st.write("""In conrast, with content based filtering, the application will recommend movies based on the movies content. If the user rated Drama or Comedy movies at 5 star then the a user will be recommended with Drama or Comedy that they have not watched. \n Alternatively, a movie can be recommended if the user liked movies by a certain Director, Production House or movies with a specific Actor.
+        """)
+        st.markdown("""
+        #### We used the models below to test our movie recommendations:
+           + KNNBasic
+           + KNNMeans
+           + KNNWithZScore
+           + SVD
+           + Baseline
+           + NormalPredictor
+            """)
+        st.markdown("""
+        ##### The image below displays how different models perfomed based on the RMSE score \n
+            """)
+        st.image("resources/imgs/model_comparison.png")
+        st.write("""
+        A low RMSE score means the model performs well because it means the difference between what our movie application recommended 
+        and what the user actually liked is low. \n
+            """)
+        st.write("""
+        With this in mind, we can understand that our graph tells us that SVD model was the best performing model to do our prediction meaning it gave the best results. \n
+            """)
+        st.markdown("""
+        #### Singular Value Decomposition (SVD)
+        SVD is a technique that is used to break down a large matrix into smaller, simpler pieces. The idea behind this is to make it easier to understand and work with the data that is contained within that matrix. \n
+        SVD is also used to reduce the dimensionality of the data which can help to improve the efficiency of the algorithm and also help to improve the model's generalization capabilities. \n
+        """)
+    if page_selection == "Movies Heatmap":
         st.info(
             "This page shows a comparison of the model performance")
+        df_out = ratings_df.join(movie_df.set_index('movieId'), on='movieId')
+
+        # Create a neat version of the utility matrix to assist with plotting book titles
+        #df_out['rating'] = df_out['rating'].astype(int)
+        util_matrix_neat = df_out.iloc[:300].pivot_table(index=['movieId'],
+                                                         columns=['title'],
+                                                         values='rating')
+
+        fig, ax = plt.subplots(figsize=(20, 10))
+        # We select only the first 100 users for ease of computation and visualisation.
+        # You can play around with this value to see more of the utility matrix.
+        _ = sns.heatmap(util_matrix_neat[:20], annot=False, ax=ax).set_title(
+            'Movies Utility Matrix')
+        st.pyplot(fig)
     if page_selection == "About the Project":
         st.title("About the project")
         st.image("resources/imgs/dc_marvel.webp")
@@ -169,7 +199,7 @@ def main():
         st.write("""+ To evaluate the performance of the developed recommendation system and make improvements as necessary to ensure that it is accurate and effective in generating relevant recommendations for users.""")
         st.write("""+ To make recommendations for the company to improve the effectiveness of their movie recommendations and increase customer engagement and revenue.""")
 
-    if page_selection == "About Us":
+    if page_selection == "About TriTech Inc.":
         st.info(
             "Below is detailed information about the our business and the team")
     if page_selection == "Team":

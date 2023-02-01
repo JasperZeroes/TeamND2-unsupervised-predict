@@ -36,6 +36,9 @@ from surprise import Reader, Dataset
 from surprise import SVD, NormalPredictor, BaselineOnly, KNNBasic, NMF
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import CountVectorizer
+import scipy as sp
+# Libraries used during sorting procedures.
+import operator  # <-- Convienient item retrieval during iteration
 # Streamlit dependencies
 import streamlit as st
 
@@ -46,6 +49,72 @@ ratings_df.drop(['timestamp'], axis=1, inplace=True)
 
 # We make use of an SVD model trained on a subset of the MovieLens 10k dataset.
 model = pickle.load(open('resources/models/svd2.pkl', 'rb'))
+
+# new function for recommendation
+
+
+def collab_generate_top_N_recommendations(movie, N=10, k=20):
+
+    df_combined = ratings_df.join(movies_df.set_index('movieId'), on='movieId')
+    util_matrix = df_combined.pivot_table(index=['movieId'],
+                                          columns=['title'],
+                                          values='rating')
+    # # Normalize each row (a given user's ratings) of the utility matrix
+    util_matrix_norm = util_matrix.apply(lambda x: (
+        x-np.mean(x))/(np.max(x)-np.min(x)), axis=1)
+    # # Fill Nan values with 0's, transpose matrix, and drop users with no ratings
+    util_matrix_norm.fillna(0, inplace=True)
+    util_matrix_norm = util_matrix_norm.T
+    util_matrix_norm = util_matrix_norm.loc[:,
+                                            (util_matrix_norm != 0).any(axis=0)]
+    # # Save the utility matrix in scipy's sparse matrix format
+    util_matrix_sparse = sp.sparse.csr_matrix(util_matrix_norm.values)
+
+    # Compute the similarity matrix using the cosine similarity metric
+    movie_similarity = cosine_similarity(util_matrix_sparse.T)
+    # Save the matrix as a dataframe to allow for easier indexing
+    movie_sim_df = pd.DataFrame(movie_similarity,
+                                index=util_matrix_norm.columns,
+                                columns=util_matrix_norm.columns)
+
+    # Review a small portion of the constructed similartiy matrix
+    movie_sim_df[:5]
+    st.write()
+    # Cold-start problem - no ratings given by the reference user.
+    # With no further user data, we solve this by simply recommending
+    # the top-N most popular books in the item catalog.
+    if movie not in movie_sim_df.columns:
+        return df_combined.groupby('title').mean().sort_values(by='rating',
+                                                               ascending=False).index[:N].to_list()
+
+    # Gather the k users which are most similar to the reference user
+    sim_movies = movie_sim_df.sort_values(
+        by=movie, ascending=False).index[1:k+1]
+    favorite_movie_items = []  # <-- List of highest rated items gathered from the k users
+    # <-- Dictionary of highest rated items in common for the k users
+    most_common_favorites = {}
+
+    for i in sim_movies:
+        # Maximum rating given by the current user to an item
+        max_score = util_matrix_norm.loc[:, i].max()
+        # Save the names of items maximally rated by the current user
+        favorite_movie_items.append(
+            util_matrix_norm[util_matrix_norm.loc[:, i] == max_score].index.tolist())
+
+    # Loop over each user's favorite items and tally which ones are
+    # most popular overall.
+    for item_collection in range(len(favorite_movie_items)):
+        for item in favorite_movie_items[item_collection]:
+            if item in most_common_favorites:
+                most_common_favorites[item] += 1
+            else:
+                most_common_favorites[item] = 1
+    # Sort the overall most popular items and return the top-N instances
+    sorted_list = sorted(most_common_favorites.items(),
+                         key=operator.itemgetter(1), reverse=True)[:N]
+    top_N = [x[0] for x in sorted_list]
+    return top_N
+####
 
 
 def prediction_item(item_id):
@@ -126,16 +195,21 @@ def collab_model(movie_list, top_n=10):
 
     indices = pd.Series(movies_df['title'])
     movie_ids = pred_movies(movie_list)
-    df_init_users = ratings_df[ratings_df['userId'] == movie_ids[0]]
+    df_init_users = ratings_df[ratings_df['movieId'] == movie_ids[0]]
+
     for i in movie_ids:
         df_init_users = df_init_users.append(
-            ratings_df[ratings_df['userId'] == i])
+            ratings_df[ratings_df['movieId'] == i])
     # Getting the cosine similarity matrix
     cosine_sim = cosine_similarity(
-        np.array(df_init_users), np.array(df_init_users))
+        np.array(movies_df['movieId']), np.array(movies_df['movieId']))
     idx_1 = indices[indices == movie_list[0]].index[0]
     idx_2 = indices[indices == movie_list[1]].index[0]
     idx_3 = indices[indices == movie_list[2]].index[0]
+
+    st.write("#########")
+    st.write(df_init_users.index[df_init_users['userId'] == 659])
+    st.write(cosine_sim)
 
     # Creating a Series with the similarity scores in descending order
     rank_1 = cosine_sim[idx_1]
