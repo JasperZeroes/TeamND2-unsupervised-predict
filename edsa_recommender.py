@@ -37,18 +37,12 @@ import scipy as sp
 from sklearn.metrics.pairwise import cosine_similarity
 
 # Custom Libraries
-#from utils.data_loader import load_movie_titles
+from utils.data_loader import load_movie_titles
 from recommenders.collaborative_based import collab_model
 from recommenders.content_based import content_model
 
 # Data Loading
-#title_list = load_movie_titles('resources/data/movies.csv')
-model = pickle.load(open('resources/models/SVD.pkl', 'rb'))
-movies_df = pd.read_csv('resources/data/movies.csv', sep=',')
-movies_df.dropna()
-ratings_df = pd.read_csv('resources/data/ratings_lit.csv')
-ratings_df = ratings_df.drop(['timestamp'], axis=1)
-title_list = movies_df['title'].to_list()
+title_list = load_movie_titles('resources/data/movies.csv')
 # load additional files
 # imdb_df = pd.read_csv('resources/data/imdb_data.csv')
 ratings_df = pd.read_csv('resources/data/ratings.csv')
@@ -132,14 +126,14 @@ def main():
         st.write("""At TriTech Inc., we guarantee rapid, reliable and robust turn-key digital solutions that will transform your business.""")
     if page_selection == "Solution Overview":
         st.title("Solution Overview")
-        st.markdown("#### This page details our solution comprehensively")
+        st.info("This page details our solution comprehensively")
         st.markdown("#### Collaborative-based vs Content-based filtering")
-        st.write(
-            "We used 2 different approaches to do our movie recommendation solution:")
-        st.write("+ Collaborative-based filtering")
+        st.markdown(
+            "**We used 2 different approaches to do our movie recommendation solution:**")
+        st.write("+ **Collaborative-based filtering**")
         st.write("""With this approach, the application will recommend movies to a specific user based on how they rated movies compared to other users. \n If for example a user gave a 5 star rating Toy Story 1 then the application will recommend movies based on what other users watched who rated Toy Story 1 at 5 star.
         """)
-        st.write("+ Content-based filtering")
+        st.write("+ **Content-based filtering**")
         st.write("""In conrast, with content based filtering, the application will recommend movies based on the movies content. If the user rated Drama or Comedy movies at 5 star then the a user will be recommended with Drama or Comedy that they have not watched. \n Alternatively, a movie can be recommended if the user liked movies by a certain Director, Production House or movies with a specific Actor.
         """)
         st.markdown("""
@@ -187,7 +181,9 @@ def main():
             'Movies Utility Matrix')
         st.pyplot(fig)
     if page_selection == "About the Project":
-        st.title("About the project")
+        st.title("A movie recommendation system")
+        st.info(
+            "This page provides a comprehensive and detailed description of the movie recommendation system")
         st.image("resources/imgs/dc_marvel.webp")
         st.markdown("""
         In today’s technology driven world, recommender systems are socially and 
@@ -221,8 +217,8 @@ def main():
 
         with tab1:
             st.subheader("Chima Enyeribe")
-            st.markdown("#### Chief Data Scientist")
-            st.image("resources/imgs/chima.webp", width=200)
+            st.markdown("#### Chief Executive Officer")
+            st.image("resources/imgs/Jasper.jpg", width=200)
             st.write("""
             Chima Enyeribe is the founder and CEO of TriTech Inc., a position he has held since the company's inception in April 2015. Prior to founding TriTech, Chima worked for Zen Bank in Nigeria, providing financial service solutions to individuals and corporates across 19 countries in Africa, Latin America and Asia.
             Under his leadership, the Bank serviced over 5 million customers and had $3 million of assets under management.
@@ -231,18 +227,33 @@ def main():
             st.markdown("jasperobed@gmail.com")
         with tab2:
             st.subheader("Kazeem Okunola")
-            st.markdown("#### Data Engineer")
+            st.markdown("#### Chief Financial Officer")
             st.image("resources/imgs/kazeem.webp", width=200)
+            st.write("""
+            Kazeem is a co-founder and Chief Financial Officer of TriTech Inc. Kazeem previously worked at Central Bank of Nigeria where he held the positions of Deputy Chief Financial Officer and Executive Risk and Compliance Officer, prior to him co-founding TriTech Inc. and becoming the Chief Financial officer in 2015.
+            Before working at the Central Bank of Nigeria, Kazeem was employed as a Finance Director of MSC Telco Holdings, and an executive director of the company's main board. He has also held various other roles at MSC Telco Holdings.
+            In addition to his, extensive financial industry experience, Kazeem has also worked in the consulting and services. He brings with him extensive financial strategy, financial management and accounting experience, with a strong background in enterprise risk management and financial controls.
+            """)
             st.markdown("achieverk2@gmail.com")
         with tab3:
             st.subheader("Thepe Mashala")
-            st.markdown("#### Software Engineer")
+            st.markdown("#### Chief Operations Officer")
             st.image("resources/imgs/8324.jpg", width=200)
+            st.write("""
+            Thepe Mashala joined TriTech Inc. in March 2018. Prior to his appointment as the Chief Operations Officer, he led the establishment of Blue Sky Group's strategic M&A business, the launch of the Group's flagship Advanced Data Analytics platform, and
+            helped shape the Group's strategic direction across a range of key topics.
+            Before joining TriTech Inc., Thepe led the Southern Africa Digital Practice for McKinsey & Company, where he focused on Digital Business Building and operational transformations for telecommunications businesses, financial services, and SMME sector clients.
+            """)
             st.markdown("tpmashala@gmail.com")
         with tab4:
             st.subheader("Dotun Olasogba")
-            st.markdown("#### Product Manager")
+            st.markdown("#### Chief Digital Officer")
             st.image("resources/imgs/dotun.jpeg", width=200)
+            st.write("""
+            Dotun joined TriTech Inc. in 2020 from MMB, where he led the debt-based financing business and was responsible for financing solutions, digital transformation and M&A execution.
+            Dotun's experience and leadership capacity is important to the company's digital portfolio optimisation drive, itself key to the strategy. This includes the digital transformation
+            realisation programme, which aims to reduce legacy systems, simplify the digital operations portfolio, reduce risk, improve digital footprint and take advantage of expansion opportunities.
+            """)
             st.markdown("dotunolasogba@yahoo.com")
         # You may want to add more sections here for aspects such as an EDA,
         # or to provide your business pitch.
