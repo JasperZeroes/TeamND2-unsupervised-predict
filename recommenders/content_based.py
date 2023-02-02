@@ -55,14 +55,13 @@ def data_preprocessing(subset_size):
 
     """
     # Subset of the data
-    movies_subset = movies.loc[:subset_size]
+    movies_subset = movies_df.loc[:subset_size]
     
     # Split genre data into individual words.
     movies_subset["keyWords"] = movies_subset["genres"].str.replace("|", " ")
     movies_subset["keyWords"] = movies_subset["keyWords"].str.lower()
     
     return movies_subset
-
 
 
 # !! DO NOT CHANGE THIS FUNCTION SIGNATURE !!
@@ -85,7 +84,10 @@ def content_model(movie_list,top_n=10):
 
     """
     # process a subset of the dataframe
-    data = data_preprocessing(27000)
+    data = data_preprocessing(2700)
+    
+    # Select a portion of the result, so as to reduce compute power
+    data = data.iloc[1493:2525].reset_index(drop=False) 
     
     # Instantiating and generating the count matrix
     count_vec = CountVectorizer()
@@ -93,11 +95,13 @@ def content_model(movie_list,top_n=10):
     cosine_sim = cosine_similarity(count_matrix, count_matrix)
     indices = pd.Series(data['title'])
     
+
     # Getting the index of the movies that match the title
     idx_list = [indices[indices == movie].index[0] for movie in movie_list]
     
     # Creating a Series with the similarity scores in descending order
-    score_series_list = [pd.Series(cosine_sim[idx]).sort_values(ascending = False) for idx in idx_list]
+    score_series_list = [pd.Series(cosine_sim[idx]).sort_values(ascending = False)
+                         for idx in idx_list]
     
     # Appending the names of movies
     listings = pd.concat(score_series_list).sort_values(ascending = False)
@@ -112,5 +116,5 @@ def content_model(movie_list,top_n=10):
     top_indexes = np.setdiff1d(top_50_indexes,idx_list)
 
     for i in top_indexes[:top_n]:
-        recommended_movies.append(list(data['title'])[i])
+        recommended_movies.append(list(movies_df['title'])[i])
     return recommended_movies
