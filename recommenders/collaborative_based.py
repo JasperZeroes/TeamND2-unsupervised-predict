@@ -135,6 +135,7 @@ def prediction_item(item_id):
 
     """
     # Data preprosessing
+
     reader = Reader(rating_scale=(0.5, 5))
     load_df = Dataset.load_from_df(ratings_df, reader)
     a_train = load_df.build_full_trainset()
@@ -193,30 +194,40 @@ def collab_model(movie_list, top_n=10):
         Titles of the top-n movie recommendations to the user.
 
     """
-
     indices = pd.Series(movies_df['title'])
     movie_ids = pred_movies(movie_list)  # This should be a list of userIds
-    df_init_users = ratings_df[ratings_df['movieId'] == movie_ids[0]]
+    df_init_users = ratings_df[ratings_df['userId'] == movie_ids[0]]
 
     for i in movie_ids:
         df_init_users = df_init_users.append(
-            ratings_df[ratings_df['movieId'] == i])
+            ratings_df[ratings_df['userId'] == i])
 
     # Loading the cosine similarity matrix from a file
-    with open("cosine_sim_matrix.pkl", "rb") as f:
-        cosine_sim = pickle.load(f)
+    # with open("cosine_sim_matrix.pkl", "rb") as f:
+    #     cosine_sim = pickle.load(f)
+    #df_out = ratings_df.join(movie_df.set_index('movieId'), on='movieId')
+
     # Getting the cosine similarity matrix
     cosine_sim = cosine_similarity(
-        np.array(movies_df['movieId']), np.array(movies_df['movieId']))
-    idx_1 = indices[indices == movie_list[0]].index[0]
-    idx_2 = indices[indices == movie_list[1]].index[0]
-    idx_3 = indices[indices == movie_list[2]].index[0]
+        np.array(df_init_users), np.array(df_init_users))
+    # Getting the index of the movies that match the title
+    #indices = indices[indices['title'] == df_init_users['title']]
+    # ids = []
+    # for i in movie_list:
+    #     st.write(
+    #         df_init_users[movies_df[movies_df['title'] == i]['movieId']-len(cosine_sim)])
+    #     ids = ids.append(
+    #         df_init_users[df_init_users[movies_df['title'] == i]['movieId']])
 
-    st.write("#########")
-    st.write(df_init_users.index[df_init_users['userId'] == 659])
-    st.write(cosine_sim)
+    idx_list = [indices[indices == movie].index[0]
+                for movie in movie_list]
+    for i in range(0, len(cosine_sim[:3])):
+        idx_list[i] = i
+
+    #st.write(df_init_users.index[df_init_users['userId'] == 659])
 
     # Creating a Series with the similarity scores in descending order
+
     score_series_list = [pd.Series(cosine_sim[idx]).sort_values(
         ascending=False) for idx in idx_list]
 
