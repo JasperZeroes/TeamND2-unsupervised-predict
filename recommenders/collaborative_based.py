@@ -37,6 +37,7 @@ from surprise import SVD, NormalPredictor, BaselineOnly, KNNBasic, NMF
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import CountVectorizer
 import scipy as sp
+import random
 # Libraries used during sorting procedures.
 import operator  # <-- Convienient item retrieval during iteration
 # Streamlit dependencies
@@ -221,8 +222,9 @@ def collab_model(movie_list, top_n=10):
 
     idx_list = [indices[indices == movie].index[0]
                 for movie in movie_list]
-    for i in range(0, len(cosine_sim[:3])):
-        idx_list[i] = i
+    tk = cosine_sim.shape
+    for i in range(0, 3):
+        idx_list[i] = random.randint(1, tk[0])
 
     #st.write(df_init_users.index[df_init_users['userId'] == 659])
 

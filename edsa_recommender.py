@@ -170,15 +170,15 @@ def main():
 
         # Create a neat version of the utility matrix to assist with plotting book titles
         #df_out['rating'] = df_out['rating'].astype(int)
-        util_matrix_neat = df_out.iloc[:300].pivot_table(index=['movieId'],
+        util_matrix_neat = df_out.iloc[:100].pivot_table(index=['movieId'],
                                                          columns=['title'],
                                                          values='rating')
 
         fig, ax = plt.subplots(figsize=(20, 10))
         # We select only the first 100 users for ease of computation and visualisation.
         # You can play around with this value to see more of the utility matrix.
-        _ = sns.heatmap(util_matrix_neat[:20], annot=False, ax=ax).set_title(
-            'Movies Utility Matrix')
+        _ = sns.heatmap(util_matrix_neat[:100], annot=False, ax=ax).set_title(
+            'Movies Ratings')
         st.pyplot(fig)
     if page_selection == "About the Project":
         st.title("A movie recommendation system")
